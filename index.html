@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Number Guessing Game</title>
+</head>
+<body>
+    <h1>Number Guessing Game</h1>
+    <p id="attempts">You have six attempts to guess the code</p>
+    <p id="result"></p>
+    <input type="number" id="userGuess" min="1" max="10" required>
+    <button type="button" onclick="checkGuess()">Guess</button>
+
+    <script>
+        var code = generateCode();
+        var attempts = 6;
+
+        function generateCode() {
+            return Math.floor(Math.random() * 10) + 1;
+        }
+
+        function checkGuess() {
+            var userGuess = parseInt(document.getElementById("userGuess").value);
+            var resultElement = document.getElementById("result");
+            var attemptsElement = document.getElementById("attempts");
+
+            if (isNaN(userGuess) || userGuess < 1 || userGuess > 10) {
+                resultElement.innerHTML = "Please enter a number between 1 and 10.";
+                return;
+            }
+
+            if (attempts > 0) {
+                attempts--;
+
+                if (userGuess === code) {
+                    resultElement.innerHTML = "Congratulations! You guessed the code!";
+                    attemptsElement.innerHTML = "The code was " + code + ". You guessed it!";
+                    document.getElementById("userGuess").disabled = true;
+                } else if (attempts > 0) {
+                    resultElement.innerHTML = "You have " + attempts + " attempts left.";
+                } else {
+                    resultElement.innerHTML = "You have run out of attempts. The code was " + code + ". Do better next time.";
+                    attemptsElement.innerHTML = "";
+                    document.getElementById("userGuess").disabled = true;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+
