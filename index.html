@@ -2,13 +2,84 @@
 <html lang="en">
 <head>
     <title>Number Guessing Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(to right, #ff9a9e, #fad0c4);
+            margin: 0;
+        }
+        .game-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            animation: fadeIn 1s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ff758c;
+            border-radius: 5px;
+            width: 60px;
+            text-align: center;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background: #ff758c;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #e84a5f;
+        }
+        #result {
+            margin-top: 10px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .win {
+            color: green;
+            animation: bounce 0.5s;
+        }
+        .lose {
+            color: red;
+            animation: shake 0.5s;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+        }
+    </style>
 </head>
 <body>
-    <h1>Number Guessing Game</h1>
-    <p id="attempts">You have six attempts to guess the code</p>
-    <p id="result"></p>
-    <input type="number" id="userGuess" min="1" max="10" required>
-    <button type="button" onclick="checkGuess()">Guess</button>
+    <div class="game-container">
+        <h1>Number Guessing Game</h1>
+        <p id="attempts">You have six attempts to guess the code</p>
+        <p id="result"></p>
+        <input type="number" id="userGuess" min="1" max="10" required>
+        <button type="button" onclick="checkGuess()">Guess</button>
+    </div>
 
     <script>
         var code = generateCode();
@@ -22,6 +93,7 @@
             var userGuess = parseInt(document.getElementById("userGuess").value);
             var resultElement = document.getElementById("result");
             var attemptsElement = document.getElementById("attempts");
+            resultElement.style.opacity = "1";
 
             if (isNaN(userGuess) || userGuess < 1 || userGuess > 10) {
                 resultElement.innerHTML = "Please enter a number between 1 and 10.";
@@ -32,13 +104,15 @@
                 attempts--;
 
                 if (userGuess === code) {
-                    resultElement.innerHTML = "Congratulations! You guessed the code!";
+                    resultElement.innerHTML = "🎉 Congratulations! You guessed the code!";
+                    resultElement.className = "win";
                     attemptsElement.innerHTML = "The code was " + code + ". You guessed it!";
                     document.getElementById("userGuess").disabled = true;
                 } else if (attempts > 0) {
-                    resultElement.innerHTML = "You have " + attempts + " attempts left.";
+                    resultElement.innerHTML = "❌ Wrong guess! You have " + attempts + " attempts left.";
                 } else {
-                    resultElement.innerHTML = "You have run out of attempts. The code was " + code + ". Do better next time.";
+                    resultElement.innerHTML = "💀 You ran out of attempts. The code was " + code + ". Try again next time.";
+                    resultElement.className = "lose";
                     attemptsElement.innerHTML = "";
                     document.getElementById("userGuess").disabled = true;
                 }
