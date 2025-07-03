@@ -6,13 +6,13 @@ A modern, interactive hangman game built with HTML, CSS, and JavaScript. Guess t
 
 **[🚀 Play Now on GitHub Pages](https://otty98.github.io/hangman-game/)**
 
-> Replace `your-username` with your actual GitHub username
 
 ## 📸 Screenshots
 
-![Hangman Game Screenshot](C:\Users\Capaciti\Documents\OWETHU_PEYANE\hangman-game\assets\Screenshot (110).png)
+![image](https://github.com/user-attachments/assets/c06dcd50-4a87-46da-8f81-46a659a34d65)
+![image](https://github.com/user-attachments/assets/04bd0b2d-df62-4305-ae6f-b58e1195c638)
 
-*Add your own screenshot here after deployment*
+
 
 ## ✨ Features
 
