@@ -1,63 +1,148 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Number Guessing Game</title>
+    <title>Hangman Game</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background: linear-gradient(to right, #ff9a9e, #fad0c4);
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
         }
         .game-container {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             text-align: center;
             animation: fadeIn 1s;
+            max-width: 600px;
+            width: 100%;
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: scale(0.9); }
             to { opacity: 1; transform: scale(1); }
         }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+        .hangman-display {
+            font-family: 'Courier New', monospace;
+            font-size: 24px;
+            line-height: 1.2;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            white-space: pre-line;
+            border: 2px solid #e9ecef;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .word-display {
+            font-size: 2em;
+            font-weight: bold;
+            letter-spacing: 10px;
+            margin: 20px 0;
+            color: #495057;
+            font-family: 'Courier New', monospace;
+        }
+        .input-section {
+            margin: 20px 0;
+        }
         input {
-            padding: 10px;
-            font-size: 16px;
-            border: 2px solid #ff758c;
-            border-radius: 5px;
+            padding: 12px 16px;
+            font-size: 18px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
             width: 60px;
             text-align: center;
+            text-transform: uppercase;
+        }
+        input:focus {
+            outline: none;
+            border-color: #764ba2;
+            box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.1);
         }
         button {
-            margin-top: 10px;
-            padding: 10px 20px;
+            margin: 0 10px;
+            padding: 12px 24px;
             font-size: 16px;
-            background: #ff758c;
+            background: linear-gradient(45deg, #667eea, #764ba2);
             border: none;
             color: white;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.3s;
+            font-weight: bold;
         }
         button:hover {
-            background: #e84a5f;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .guessed-letters {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+        }
+        .guessed-letters h3 {
+            margin: 0 0 10px 0;
+            color: #495057;
+        }
+        .letter-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .letter {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .letter.correct {
+            background: #28a745;
+            color: white;
+        }
+        .letter.incorrect {
+            background: #dc3545;
+            color: white;
         }
         #result {
-            margin-top: 10px;
+            margin-top: 20px;
             font-weight: bold;
+            font-size: 1.2em;
             opacity: 0;
             transition: opacity 0.5s ease-in-out;
         }
         .win {
-            color: green;
+            color: #28a745;
             animation: bounce 0.5s;
         }
         .lose {
-            color: red;
+            color: #dc3545;
             animation: shake 0.5s;
         }
         @keyframes bounce {
@@ -70,57 +155,255 @@
             50% { transform: translateX(5px); }
             75% { transform: translateX(-5px); }
         }
+        .game-info {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .info-item {
+            padding: 10px 15px;
+            background: #e9ecef;
+            border-radius: 8px;
+            color: #495057;
+        }
     </style>
 </head>
 <body>
     <div class="game-container">
-        <h1>Number Guessing Game</h1>
-        <p id="attempts">You have six attempts to guess the code</p>
-        <p id="result"></p>
-        <input type="number" id="userGuess" min="1" max="10" required>
-        <button type="button" onclick="checkGuess()">Guess</button>
+        <h1>🎯 Hangman Game</h1>
+        
+        <div class="game-info">
+            <div class="info-item">
+                <div>Wrong Guesses: <span id="wrongCount">0</span>/6</div>
+            </div>
+            <div class="info-item">
+                <div>Category: <span id="category">Animals</span></div>
+            </div>
+        </div>
+
+        <div class="hangman-display" id="hangmanDisplay">
+            Choose a letter to start!
+        </div>
+
+        <div class="word-display" id="wordDisplay">
+            _ _ _ _ _
+        </div>
+
+        <div class="input-section">
+            <input type="text" id="letterInput" maxlength="1" placeholder="?">
+            <button onclick="guessLetter()" id="guessBtn">Guess Letter</button>
+            <button onclick="newGame()" id="newGameBtn">New Game</button>
+        </div>
+
+        <div class="guessed-letters">
+            <h3>Guessed Letters</h3>
+            <div class="letter-grid" id="guessedGrid"></div>
+        </div>
+
+        <div id="result"></div>
     </div>
 
     <script>
-        var code = generateCode();
-        var attempts = 6;
+        const words = {
+            animals: ['ELEPHANT', 'GIRAFFE', 'PENGUIN', 'DOLPHIN', 'KANGAROO', 'BUTTERFLY', 'CHEETAH', 'OCTOPUS'],
+            fruits: ['PINEAPPLE', 'STRAWBERRY', 'WATERMELON', 'BLUEBERRY', 'RASPBERRY', 'COCONUT', 'AVOCADO'],
+            countries: ['AUSTRALIA', 'SWITZERLAND', 'INDONESIA', 'ARGENTINA', 'THAILAND', 'PORTUGAL', 'CANADA'],
+            sports: ['BASKETBALL', 'VOLLEYBALL', 'SWIMMING', 'FOOTBALL', 'BASEBALL', 'TENNIS', 'CRICKET']
+        };
 
-        function generateCode() {
-            return Math.floor(Math.random() * 10) + 1;
+        const hangmanStages = [
+            "Choose a letter to start!",
+            `   +---+
+   |   |
+       |
+       |
+       |
+       |
+=========`,
+            `   +---+
+   |   |
+   O   |
+       |
+       |
+       |
+=========`,
+            `   +---+
+   |   |
+   O   |
+   |   |
+       |
+       |
+=========`,
+            `   +---+
+   |   |
+   O   |
+  /|   |
+       |
+       |
+=========`,
+            `   +---+
+   |   |
+   O   |
+  /|\\  |
+       |
+       |
+=========`,
+            `   +---+
+   |   |
+   O   |
+  /|\\  |
+  /    |
+       |
+=========`,
+            `   +---+
+   |   |
+   O   |
+  /|\\  |
+  / \\  |
+       |
+=========`
+        ];
+
+        let currentWord = '';
+        let currentCategory = '';
+        let guessedLetters = [];
+        let wrongGuesses = 0;
+        let gameOver = false;
+
+        function initGame() {
+            const categories = Object.keys(words);
+            currentCategory = categories[Math.floor(Math.random() * categories.length)];
+            const wordList = words[currentCategory];
+            currentWord = wordList[Math.floor(Math.random() * wordList.length)];
+            
+            guessedLetters = [];
+            wrongGuesses = 0;
+            gameOver = false;
+            
+            document.getElementById('category').textContent = currentCategory.charAt(0).toUpperCase() + currentCategory.slice(1);
+            document.getElementById('wrongCount').textContent = wrongGuesses;
+            document.getElementById('hangmanDisplay').textContent = hangmanStages[0];
+            document.getElementById('letterInput').disabled = false;
+            document.getElementById('guessBtn').disabled = false;
+            document.getElementById('letterInput').value = '';
+            document.getElementById('result').style.opacity = '0';
+            document.getElementById('result').className = '';
+            
+            updateWordDisplay();
+            updateGuessedLetters();
         }
 
-        function checkGuess() {
-            var userGuess = parseInt(document.getElementById("userGuess").value);
-            var resultElement = document.getElementById("result");
-            var attemptsElement = document.getElementById("attempts");
-            resultElement.style.opacity = "1";
-
-            if (isNaN(userGuess) || userGuess < 1 || userGuess > 10) {
-                resultElement.innerHTML = "Please enter a number between 1 and 10.";
-                return;
-            }
-
-            if (attempts > 0) {
-                attempts--;
-
-                if (userGuess === code) {
-                    resultElement.innerHTML = "🎉 Congratulations! You guessed the code!";
-                    resultElement.className = "win";
-                    attemptsElement.innerHTML = "The code was " + code + ". You guessed it!";
-                    document.getElementById("userGuess").disabled = true;
-                } else if (attempts > 0) {
-                    resultElement.innerHTML = "❌ Wrong guess! You have " + attempts + " attempts left.";
+        function updateWordDisplay() {
+            let display = '';
+            for (let i = 0; i < currentWord.length; i++) {
+                if (guessedLetters.includes(currentWord[i])) {
+                    display += currentWord[i] + ' ';
                 } else {
-                    resultElement.innerHTML = "💀 You ran out of attempts. The code was " + code + ". Try again next time.";
-                    resultElement.className = "lose";
-                    attemptsElement.innerHTML = "";
-                    document.getElementById("userGuess").disabled = true;
+                    display += '_ ';
                 }
             }
+            document.getElementById('wordDisplay').textContent = display.trim();
         }
+
+        function updateGuessedLetters() {
+            const grid = document.getElementById('guessedGrid');
+            grid.innerHTML = '';
+            
+            guessedLetters.forEach(letter => {
+                const letterDiv = document.createElement('div');
+                letterDiv.className = 'letter';
+                letterDiv.textContent = letter;
+                
+                if (currentWord.includes(letter)) {
+                    letterDiv.classList.add('correct');
+                } else {
+                    letterDiv.classList.add('incorrect');
+                }
+                
+                grid.appendChild(letterDiv);
+            });
+        }
+
+        function guessLetter() {
+            const input = document.getElementById('letterInput');
+            const letter = input.value.toUpperCase();
+            
+            if (!letter || letter.length !== 1 || !/[A-Z]/.test(letter)) {
+                alert('Please enter a valid letter!');
+                return;
+            }
+            
+            if (guessedLetters.includes(letter)) {
+                alert('You already guessed that letter!');
+                return;
+            }
+            
+            if (gameOver) return;
+            
+            guessedLetters.push(letter);
+            input.value = '';
+            
+            if (currentWord.includes(letter)) {
+                // Correct guess
+                updateWordDisplay();
+                checkWin();
+            } else {
+                // Wrong guess
+                wrongGuesses++;
+                document.getElementById('wrongCount').textContent = wrongGuesses;
+                document.getElementById('hangmanDisplay').textContent = hangmanStages[wrongGuesses];
+                
+                if (wrongGuesses >= 6) {
+                    gameOver = true;
+                    showResult(false);
+                }
+            }
+            
+            updateGuessedLetters();
+        }
+
+        function checkWin() {
+            const wordComplete = currentWord.split('').every(letter => guessedLetters.includes(letter));
+            if (wordComplete) {
+                gameOver = true;
+                showResult(true);
+            }
+        }
+
+        function showResult(won) {
+            const resultElement = document.getElementById('result');
+            resultElement.style.opacity = '1';
+            
+            if (won) {
+                resultElement.innerHTML = `🎉 Congratulations! You guessed "${currentWord}" correctly!`;
+                resultElement.className = 'win';
+            } else {
+                resultElement.innerHTML = `💀 Game Over! The word was "${currentWord}". Better luck next time!`;
+                resultElement.className = 'lose';
+            }
+            
+            document.getElementById('letterInput').disabled = true;
+            document.getElementById('guessBtn').disabled = true;
+        }
+
+        function newGame() {
+            initGame();
+        }
+
+        // Event listeners
+        document.getElementById('letterInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                guessLetter();
+            }
+        });
+
+        document.getElementById('letterInput').addEventListener('input', function(e) {
+            e.target.value = e.target.value.toUpperCase();
+        });
+
+        // Initialize the game
+        initGame();
     </script>
 </body>
 </html>
-
-
-
